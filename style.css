@@ -148,7 +148,9 @@ header {
 }
 .logo-en {
   font-family: 'Inter', sans-serif;
-  font-size: 13px; font-style: italic; color: var(--text2); letter-spacing: 2px;
+  font-size: 15px; font-style: italic; color: var(--text2); letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 
 nav { display: flex; gap: 28px; align-items: center; }
