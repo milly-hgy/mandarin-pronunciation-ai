@@ -300,10 +300,11 @@ function buildErrorSummary(syllables) {
   const container = document.getElementById('errorSummaryContent');
   if (!container) return;
 
-  const toneErrs    = syllables.filter(s => s.type === 'tone-error');
-  const initialErrs = syllables.filter(s => s.type === 'initial-error');
-  const vowelErrs   = syllables.filter(s => s.type === 'vowel-error');
-  const items       = [];
+  const toneErrs     = syllables.filter(s => s.type === 'tone-error');
+  const initialErrs  = syllables.filter(s => s.type === 'initial-error');
+  const vowelErrs    = syllables.filter(s => s.type === 'vowel-error');
+  const compoundErrs = syllables.filter(s => s.type === 'compound-error');
+  const items        = [];
 
   if (toneErrs.length)
     items.push({
@@ -313,15 +314,21 @@ function buildErrorSummary(syllables) {
     });
   if (initialErrs.length)
     items.push({
-      color:'#c4a8ff', icon:'🟣',
+      color:'#f1c40f', icon:'🟡',
       label:`Initial Consonant Errors — <span style="font-family:'Noto Serif SC',serif;font-size:14px">${initialErrs.map(s=>s.char).join(' ')}</span>`,
       tip:'Tongue and lip positioning for these initials needs attention. Contrast pairs like x/sh and z/zh slowly in a mirror.'
     });
   if (vowelErrs.length)
     items.push({
-      color:'#f0b429', icon:'🟠',
-      label:`Vowel / Final Errors — <span style="font-family:'Noto Serif SC',serif;font-size:14px">${vowelErrs.map(s=>s.char).join(' ')}</span>`,
+      color:'#9b59b6', icon:'🟣',
+      label:`Simple Final Errors — <span style="font-family:'Noto Serif SC',serif;font-size:14px">${vowelErrs.map(s=>s.char).join(' ')}</span>`,
       tip:'Mouth opening shape or lip rounding needs adjustment. For ü: hold "ee" tongue position while rounding lips tightly.'
+    });
+  if (compoundErrs.length)
+    items.push({
+      color:'#3498db', icon:'🔵',
+      label:`Compound Errors — <span style="font-family:'Noto Serif SC',serif;font-size:14px">${compoundErrs.map(s=>s.char).join(' ')}</span>`,
+      tip:'Complex final or compound initial-final combination needs work. Slow down and isolate each phoneme component separately.'
     });
 
   if (items.length === 0) {
