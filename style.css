@@ -1278,9 +1278,15 @@ footer::after {
    MOBILE — max-width: 768px
 ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
+    /* 1. 確保最外層容器不會左右滑動 */
+    body {
+        overflow-x: hidden;
+    }
+
     .container {
-        width: 95%;          /* 讓容器佔滿螢幕 */
-        padding: 10px;       /* 縮小內距 */
+        width: 92% !important;
+        margin: 10px auto;
+        padding: 15px;
         flex-direction: column; /* 如果有並排的元素，改為上下排列 */
     }
 
@@ -1289,8 +1295,41 @@ footer::after {
         margin-bottom: 20px;
     }
 
-    h1 {
-        font-size: 1.5rem;   /* 縮小手機版的標題字體 */
+    /* 2. 解決「分析中」文字過大問題 */
+    h1, .analysis-title {
+        font-size: 1.8rem !important;
+        word-break: break-all; /* 防止長單字撐開版面 */
+    }
+
+    /* 3. 處理音高圖表（Pitch Contour）被壓縮問題 */
+    .chart-container {
+        width: 100%;
+        overflow-x: auto; /* 讓圖表在小螢幕可以左右滑動，而不是被壓扁 */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 4. 讓並排的按鈕在手機上改為上下堆疊，避免擠壓 */
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%; /* 按鈕佔滿寬度，比較好按 */
+        margin-left: 0 !important;
+    }
+
+    /* 5. 調整 AI 反饋卡片內的文字間距 */
+    .feedback-card {
+        padding: 15px;
+        font-size: 0.95rem; /* 稍微縮小字體以容納更多內容 */
+    }
+
+    /* 6. 防止圖片或 SVG 超出卡片 */
+    img, svg {
+        max-width: 100%;
+        height: auto;
     }
 }
 .ph-swatch { width: 12px; height: 12px; border-radius: 3px; }
