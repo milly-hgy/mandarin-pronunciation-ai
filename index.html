@@ -460,6 +460,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3/dist/index.js"></script>
 <script>
 /* ═══════════════════════════════════════════
    STATIC DATA
@@ -737,8 +738,16 @@ function buildSyllablesFromSTT(text) {
   };
 
   return chars.slice(0, 10).map((char, i) => {
-    const pinyin = PINYIN_DICT[char] || 'mǎ';
-    const type   = errorPool[i % errorPool.length];
+    let pinyin;
+    if (window.pinyinPro) {
+      // Dynamic conversion via pinyin-pro — works for any Chinese character
+      const result = window.pinyinPro.pinyin(char, { toneType: 'symbol', type: 'array' });
+      pinyin = (result && result[0]) || PINYIN_DICT[char] || '?';
+    } else {
+      // Static dictionary fallback (used if CDN is unavailable)
+      pinyin = PINYIN_DICT[char] || '?';
+    }
+    const type = errorPool[i % errorPool.length];
     return { char, pinyin, type, tooltip: tooltipMap[type] };
   });
 }
@@ -830,7 +839,7 @@ function updateVideoIntervention(errorType, phoneme) {
   const ph      = document.getElementById('ytPlaceholder');
 
   if (iframe) {
-    iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startTime}&autoplay=1`;
+    iframe.src = `https://www.youtube.com/embed/${videoId}?start=${startTime}&autoplay=0`;
   }
   if (caption) {
     caption.textContent = `Recommended for you: Practice your "${displayLabel}" technique.`;
@@ -1051,7 +1060,8 @@ function showResults() {
 
   /* — Pitch contour section — */
   setFlowStep(3);
-  buildContourCards();
+  const pitchData = sttRecognized ? buildPitchDataFromSyllables(currentSyllables) : SENTENCE_PITCH;
+  buildContourCards(pitchData);
   const cs = document.getElementById('contourSection');
   cs.classList.add('visible');
   cs.scrollIntoView({behavior:'smooth', block:'start'});
@@ -1124,14 +1134,50 @@ function animateScoreRing(score) {
   ring.style.strokeDashoffset = circumference - (score / 100) * circumference;
 }
 
+/* ═══════════════════════════════════════════
+   GENERATE PITCH DATA FROM SYLLABLES
+═══════════════════════════════════════════ */
+function buildPitchDataFromSyllables(syllables) {
+  const NATIVE_CURVES = {
+    0: [.44,.43,.43,.42,.42,.42,.41,.41],
+    1: [.82,.82,.82,.82,.82,.82,.82,.82],
+    2: [.28,.38,.50,.62,.72,.82,.88,.93],
+    3: [.55,.38,.18,.10,.08,.25,.52,.72],
+    4: [.92,.82,.68,.52,.40,.28,.18,.10],
+  };
+  function toneFromPinyin(p) {
+    if (/[āōēīūǖ]/.test(p)) return 1;
+    if (/[áóéíúǘ]/.test(p)) return 2;
+    if (/[ǎǒěǐǔǚ]/.test(p)) return 3;
+    if (/[àòèìùǜ]/.test(p)) return 4;
+    return 0;
+  }
+  function clamp(v) { return Math.min(1, Math.max(0.05, v)); }
+  function buildUserCurve(native, type) {
+    if (type === 'tone-error')
+      return native.map(v => clamp(v * 0.35 + 0.42 + (Math.random() - 0.5) * 0.06));
+    if (type === 'initial-error' || type === 'vowel-error')
+      return native.map(v => clamp(v + (Math.random() - 0.5) * 0.10));
+    return native.map(v => clamp(v + (Math.random() - 0.5) * 0.04));
+  }
+  return syllables.map(s => {
+    const tone   = toneFromPinyin(s.pinyin);
+    const native = (NATIVE_CURVES[tone] || NATIVE_CURVES[0]).slice();
+    const user   = buildUserCurve(native, s.type);
+    const error  = s.type !== 'correct' ? s.type : undefined;
+    return { char: s.char, pinyin: s.pinyin, tone, native, user, error };
+  });
+}
+
 /* ═══ FULL-SENTENCE PITCH CONTOUR CANVAS ═══ */
-function buildContourCards() {
+function buildContourCards(pitchData) {
   const grid = document.getElementById('contourGrid');
+  const sentenceTitle = (pitchData || SENTENCE_PITCH).map(d => d.char).join('');
   grid.innerHTML = `
     <div class="contour-card" style="grid-column:1/-1">
       <div class="contour-header">
         <div style="font-family:'Noto Serif SC',serif;font-size:20px;font-weight:700;color:var(--text);letter-spacing:3px">
-          下個星期六，我們學校有一個音樂會，希望你能來。
+          ${sentenceTitle}
         </div>
         <div class="contour-meta">
           <div class="contour-pinyin">Full Sentence — F0 Pitch Contour</div>
@@ -1150,10 +1196,11 @@ function buildContourCards() {
         </div>
       </div>
     </div>`;
-  requestAnimationFrame(() => drawFullSentenceContour());
+  requestAnimationFrame(() => drawFullSentenceContour(pitchData));
 }
 
-function drawFullSentenceContour() {
+function drawFullSentenceContour(pitchData) {
+  const data   = pitchData || SENTENCE_PITCH;
   const canvas = document.getElementById('cv_full');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -1169,13 +1216,13 @@ function drawFullSentenceContour() {
   const W = cssW, H = cssH;
   const PT = 20, PB = 36, PL = 32, PR = 16;
   const iW = W - PL - PR, iH = H - PT - PB;
-  const N  = SENTENCE_PITCH.length;
+  const N  = data.length;
   const STEP = iW / N;   // one column per syllable
 
   ctx.clearRect(0, 0, W, H);
 
   // Background error zones
-  SENTENCE_PITCH.forEach((d, i) => {
+  data.forEach((d, i) => {
     if (!d.error) return;
     const x0 = PL + i * STEP;
     const col = d.error === 'initial-error'  ? 'rgba(245,158,11,0.12)' :
@@ -1203,7 +1250,7 @@ function drawFullSentenceContour() {
 
   // Syllable column separators + labels
   ctx.textAlign = 'center';
-  SENTENCE_PITCH.forEach((d, i) => {
+  data.forEach((d, i) => {
     const cx = PL + i * STEP + STEP / 2;
     // separator
     ctx.strokeStyle = 'rgba(30,41,59,0.06)'; ctx.lineWidth = 1; ctx.setLineDash([2,4]);
@@ -1226,7 +1273,7 @@ function drawFullSentenceContour() {
   function midPt(arr) { return (arr[3] + arr[4]) / 2; }
   function allPts(key) {
     const pts = [];
-    SENTENCE_PITCH.forEach((d, i) => {
+    data.forEach((d, i) => {
       // Use 3 points per syllable for smoother curve: start, mid, end
       [0, 3, 7].forEach((si, j) => {
         const x = PL + (i + (si / 7)) * STEP;
@@ -1264,7 +1311,7 @@ function drawFullSentenceContour() {
   ctx.setLineDash([]);
 
   // Error dots
-  SENTENCE_PITCH.forEach((d, i) => {
+  data.forEach((d, i) => {
     if (!d.error) return;
     const cx = PL + (i + 0.5) * STEP;
     const ny = PT + iH - midPt(d.native) * iH;

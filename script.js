@@ -279,8 +279,16 @@ function buildSyllablesFromSTT(text) {
   };
 
   return chars.slice(0, 10).map((char, i) => {
-    const pinyin = PINYIN_DICT[char] || 'mǎ';
-    const type   = errorPool[i % errorPool.length];
+    let pinyin;
+    if (window.pinyinPro) {
+      // Dynamic conversion via pinyin-pro — works for any Chinese character
+      const result = window.pinyinPro.pinyin(char, { toneType: 'symbol', type: 'array' });
+      pinyin = (result && result[0]) || PINYIN_DICT[char] || '?';
+    } else {
+      // Static dictionary fallback (used if CDN is unavailable)
+      pinyin = PINYIN_DICT[char] || '?';
+    }
+    const type = errorPool[i % errorPool.length];
     return { char, pinyin, type, tooltip: tooltipMap[type] };
   });
 }
@@ -593,7 +601,8 @@ function showResults() {
 
   /* — Pitch contour section — */
   setFlowStep(3);
-  buildContourCards();
+  const pitchData = sttRecognized ? buildPitchDataFromSyllables(currentSyllables) : SENTENCE_PITCH;
+  buildContourCards(pitchData);
   const cs = document.getElementById('contourSection');
   cs.classList.add('visible');
   cs.scrollIntoView({behavior:'smooth', block:'start'});
@@ -666,26 +675,62 @@ function animateScoreRing(score) {
   ring.style.strokeDashoffset = circumference - (score / 100) * circumference;
 }
 
+/* ═══════════════════════════════════════════
+   GENERATE PITCH DATA FROM SYLLABLES
+═══════════════════════════════════════════ */
+function buildPitchDataFromSyllables(syllables) {
+  const NATIVE_CURVES = {
+    0: [.44,.43,.43,.42,.42,.42,.41,.41],
+    1: [.82,.82,.82,.82,.82,.82,.82,.82],
+    2: [.28,.38,.50,.62,.72,.82,.88,.93],
+    3: [.55,.38,.18,.10,.08,.25,.52,.72],
+    4: [.92,.82,.68,.52,.40,.28,.18,.10],
+  };
+  function toneFromPinyin(p) {
+    if (/[āōēīūǖ]/.test(p)) return 1;
+    if (/[áóéíúǘ]/.test(p)) return 2;
+    if (/[ǎǒěǐǔǚ]/.test(p)) return 3;
+    if (/[àòèìùǜ]/.test(p)) return 4;
+    return 0;
+  }
+  function clamp(v) { return Math.min(1, Math.max(0.05, v)); }
+  function buildUserCurve(native, type) {
+    if (type === 'tone-error')
+      return native.map(v => clamp(v * 0.35 + 0.42 + (Math.random() - 0.5) * 0.06));
+    if (type === 'initial-error' || type === 'vowel-error')
+      return native.map(v => clamp(v + (Math.random() - 0.5) * 0.10));
+    return native.map(v => clamp(v + (Math.random() - 0.5) * 0.04));
+  }
+  return syllables.map(s => {
+    const tone   = toneFromPinyin(s.pinyin);
+    const native = (NATIVE_CURVES[tone] || NATIVE_CURVES[0]).slice();
+    const user   = buildUserCurve(native, s.type);
+    const error  = s.type !== 'correct' ? s.type : undefined;
+    return { char: s.char, pinyin: s.pinyin, tone, native, user, error };
+  });
+}
+
 /* ═══ FULL-SENTENCE PITCH CONTOUR CANVAS ═══ */
-function buildContourCards() {
+function buildContourCards(pitchData) {
+  var data = pitchData || SENTENCE_PITCH;
   var grid = document.getElementById('contourGrid');
   if (!grid) return;
   var W=900, H=160;
   var PT=20, PB=36, PL=32, PR=16;
   var iW=W-PL-PR, iH=H-PT-PB;
-  var N=SENTENCE_PITCH.length;
+  var N=data.length;
   var STEP=iW/N;
 
   function px(i, si) { return (PL + (i + si/7) * STEP).toFixed(2); }
   function py(v)     { return (PT + iH - v * iH).toFixed(2); }
 
   function buildPts(key) {
-    return SENTENCE_PITCH.map(function(d,i) {
+    return data.map(function(d,i) {
       return [0,3,7].map(function(si){ return px(i,si)+','+py(d[key][si]); }).join(' ');
     }).join(' ');
   }
 
-  var zones = SENTENCE_PITCH.map(function(d,i) {
+  var zones = data.map(function(d,i) {
     if (!d.error) return '';
     var x0   = (PL + i*STEP).toFixed(2);
     var sw   = STEP.toFixed(2);
@@ -702,7 +747,7 @@ function buildContourCards() {
            '<text x="'+(PL-5)+'" y="'+(parseFloat(y)+3.5).toFixed(1)+'" text-anchor="end" font-size="9" font-family="Inter,sans-serif" fill="rgba(30,41,59,0.30)">'+lbl+'</text>';
   }).join('');
 
-  var colLabels = SENTENCE_PITCH.map(function(d,i) {
+  var colLabels = data.map(function(d,i) {
     var cx   = (PL + i*STEP + STEP/2).toFixed(2);
     var sepX = (PL + i*STEP).toFixed(2);
     var yB   = PT+iH;
@@ -716,7 +761,7 @@ function buildContourCards() {
   }).join('');
 
   function midPt(arr) { return (arr[3]+arr[4])/2; }
-  var errLines = SENTENCE_PITCH.map(function(d,i) {
+  var errLines = data.map(function(d,i) {
     if (!d.error) return '';
     var cx  = (PL + (i+0.5)*STEP).toFixed(2);
     var ny  = (PT + iH - midPt(d.native)*iH).toFixed(2);
@@ -744,7 +789,7 @@ function buildContourCards() {
     '<div class="contour-card" style="grid-column:1/-1">'+
       '<div class="contour-header">'+
         '<div style="font-family:\'Noto Serif SC\',serif;font-size:20px;font-weight:700;color:var(--text);letter-spacing:3px">'+
-          '下個星期六，我們學校有一個音樂會，希望你能來。'+
+          data.map(function(d) { return d.char; }).join('')+
         '</div>'+
         '<div class="contour-meta">'+
           '<div class="contour-pinyin">Full Sentence — F0 Pitch Contour</div>'+
