@@ -593,7 +593,7 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 }
 
 .breakdown-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
+  display: flex; align-items: center;
   margin-bottom: 40px;
 }
 .breakdown-header-left { flex: 1; }
@@ -604,10 +604,15 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 
 /* Overall score ring */
 .overall-score-ring {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
   flex-shrink: 0;
+  margin-right: 40px;
 }
-.ring-svg { width: 100px; height: 100px; transform: rotate(-90deg); }
+.ring-wrapper {
+  position: relative;
+  width: 130px; height: 130px;
+}
+.ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-bg { fill: none; stroke: rgba(30,41,59,0.08); stroke-width: 8; }
 .ring-fill {
   fill: none; stroke-width: 8; stroke-linecap: round;
@@ -616,8 +621,11 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
   stroke-dashoffset: 251.2;
   transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
 }
-.ring-score-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; fill: var(--text); text-anchor: middle; transform: rotate(90deg); transform-origin: 50px 50px; }
-.ring-score-label { font-size: 8px; fill: var(--text3); text-anchor: middle; transform: rotate(90deg); transform-origin: 50px 50px; letter-spacing: 1px; }
+.ring-score-display {
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+}
+.ring-score-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
 .ring-caption { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; text-align: center; }
 
 /* Category rows */
@@ -706,37 +714,57 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 }
 .breakdown-title::after { content:''; flex:1; height:1px; background: var(--glass-border); }
 
-.utterance-display { display: flex; flex-wrap: wrap; margin-bottom: 24px; }
+.utterance-display { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
 
 .syllable-unit {
   display: flex; flex-direction: column; align-items: center;
   padding: 10px 14px; cursor: pointer;
-  border-bottom: 3px solid transparent;
+  background: transparent;
+  border-bottom: 4px solid transparent;
   transition: all 0.2s; position: relative;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
-.syllable-unit:hover { background: rgba(59,130,246,0.05); border-radius: var(--radius-sm); }
-.syl-char { font-family: 'Noto Serif SC', serif; font-size: 38px; font-weight: 700; line-height: 1; }
-.syl-pinyin { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; margin-top: 4px; }
+.syllable-unit:hover { background: rgba(59,130,246,0.04); border-radius: var(--radius-sm); }
+.syl-char { font-family: 'Noto Serif SC', serif; font-size: 38px; font-weight: 700; line-height: 1; color: #2d3436; }
+.syl-pinyin { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; margin-top: 4px; color: #2d3436; }
+/* Reset ph-* global colors so only the targeted span gets the error colour */
+.syl-pinyin span { color: #2d3436; }
 
-.syllable-unit.correct .syl-char { color: var(--text); }
-.syllable-unit.correct .syl-pinyin { color: var(--text3); }
+/* Correct: fully transparent — no background, no border, no shadow */
+.syllable-unit.correct { background: transparent; border-bottom-color: transparent; }
+.syllable-unit.correct .syl-char   { color: #2d3436; }
+.syllable-unit.correct .syl-pinyin { color: #2d3436; }
 
-.syllable-unit.tone-error .syl-char { color: var(--vermillion); }
-.syllable-unit.tone-error .syl-pinyin { color: var(--vermillion); text-decoration: underline; text-underline-offset: 3px; }
-.syllable-unit.tone-error { border-bottom-color: var(--vermillion); background: var(--error-bg); }
+/* Error boxes: frosted glass floating card */
+.syllable-unit.compound-error,
+.syllable-unit.vowel-error,
+.syllable-unit.initial-error,
+.syllable-unit.tone-error {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.3);
+}
 
-.syllable-unit.initial-error .syl-char { color: var(--gold); }
-.syllable-unit.initial-error .syl-pinyin { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
-.syllable-unit.initial-error { border-bottom-color: var(--gold); background: var(--warn-bg); }
+/* Compound error — entire final region (vowel + coda) → blue  [lowest CSS priority] */
+.syllable-unit.compound-error { border-bottom-color: #3498db; }
+.syllable-unit.compound-error .ph-tone,
+.syllable-unit.compound-error .ph-simple,
+.syllable-unit.compound-error .ph-compound { color: #3498db; }
 
-.syllable-unit.vowel-error .syl-char { color: #b89af8; }
-.syllable-unit.vowel-error .syl-pinyin { color: #b89af8; text-decoration: underline; text-underline-offset: 3px; }
-.syllable-unit.vowel-error { border-bottom-color: #b89af8; background: rgba(184,154,248,0.08); }
+/* Simple final error — vowel part → purple */
+.syllable-unit.vowel-error { border-bottom-color: #9b59b6; }
+.syllable-unit.vowel-error .ph-tone,
+.syllable-unit.vowel-error .ph-simple,
+.syllable-unit.vowel-error .ph-compound { color: #9b59b6; }
 
-.syllable-unit.compound-error .syl-char { color: var(--blue); }
-.syllable-unit.compound-error .syl-pinyin { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
-.syllable-unit.compound-error { border-bottom-color: var(--blue); background: var(--blue-soft); }
+/* Initial error — first consonant letter only → gold */
+.syllable-unit.initial-error { border-bottom-color: #f1c40f; }
+.syllable-unit.initial-error .ph-initial { color: #f1c40f; }
+
+/* Tone error — tone-marked character only → red  [highest CSS priority, written last] */
+.syllable-unit.tone-error { border-bottom-color: var(--vermillion); }
+.syllable-unit.tone-error .ph-tone { color: var(--vermillion); }
 
 .syl-tooltip {
   display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
@@ -753,8 +781,8 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 .cl-item { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
 .cl-swatch { width: 12px; height: 12px; border-radius: 3px; }
 .cl-tone     { background: var(--red); }
-.cl-initial  { background: var(--gold); }
-.cl-vowel    { background: #b89af8; }
+.cl-initial  { background: #f1c40f; }
+.cl-vowel    { background: #9b59b6; }
 .cl-compound { background: var(--blue); }
 
 /* Inline video push */
