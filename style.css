@@ -832,43 +832,6 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 .vid-btn:active { box-shadow: var(--neu-inset); transform: translateY(1px); }
 .vid-btn svg { width: 9px; height: 9px; fill: var(--accent); flex-shrink: 0; }
 
-/* ── Inline Articulatory Card ── */
-.aic-card {
-  background: var(--bg);
-  border-radius: var(--radius);
-  box-shadow: var(--neu-shadow-sm);
-  overflow: hidden;
-  margin-bottom: 16px;
-  transition: box-shadow 0.3s;
-}
-.aic-header {
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid var(--glass-border);
-  display: flex; align-items: baseline; gap: 10px;
-  background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(6,182,212,0.03));
-}
-.aic-tag  { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); font-weight: 600; flex-shrink: 0; }
-.aic-title { font-size: 12px; font-weight: 600; color: var(--text); }
-.aic-body {
-  display: flex; flex-direction: row; gap: 24px;
-  min-height: 130px;
-}
-.aic-svg-col {
-  padding: 10px 8px;
-  border-right: 1px solid var(--glass-border);
-  display: flex; align-items: center; justify-content: center;
-  background: var(--bg);
-  box-shadow: inset 2px 2px 8px rgba(163,177,198,0.35), inset -2px -2px 8px rgba(255,255,255,0.65);
-}
-.aic-svg-col svg { width: 90px; height: auto; display: block; }
-.aic-desc {
-  padding: 12px 14px;
-  font-size: 11px; color: var(--text2); line-height: 1.7;
-}
-.aic-placeholder { font-size: 11px; color: var(--text3); font-style: italic; line-height: 1.7; }
-.aic-step-num { font-size: 9px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; font-weight: 600; }
-.aic-step-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-.aic-step-text { font-size: 11px; color: var(--text2); line-height: 1.65; }
 
 /* ═══════════════════════════════════════════
    TONE SUMMARY CARD + ANALYSIS PANEL
@@ -924,7 +887,7 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 
 .feedback-list { display: flex; flex-direction: column; gap: 12px; }
 .feedback-item {
-  display: flex; gap: 12px; padding: 14px;
+  display: flex; gap: 16px; padding: 20px;
   background: var(--bg);
   border: none; border-radius: var(--radius-sm);
   border-left: 4px solid transparent; transition: all 0.2s; cursor: pointer;
@@ -934,21 +897,49 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 .feedback-item.error { border-left-color: var(--vermillion); }
 .feedback-item.warning { border-left-color: var(--gold); }
 .feedback-item.ok { border-left-color: var(--jade); }
-.feedback-icon { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; }
+.feedback-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
 .feedback-icon.error   { background: rgba(232,80,58,0.15); color: var(--vermillion); }
 .feedback-icon.warning { background: rgba(240,180,41,0.15); color: var(--gold); }
 .feedback-icon.ok      { background: rgba(52,216,160,0.15); color: var(--jade); }
-.feedback-title { font-size: 12px; font-weight: 500; margin-bottom: 3px; color: var(--text); }
-.feedback-desc { font-size: 11px; color: var(--text2); line-height: 1.65; letter-spacing: 0.3px; }
+.feedback-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.feedback-desc { font-size: 13px; color: var(--text2); line-height: 1.6; letter-spacing: 0.2px; }
+
+/* ── Inline card guide (toggled by Articulatory Guide button) ── */
+.card-guide {
+  margin-top: 20px;
+  padding: 20px 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neu-shadow-sm);
+}
+.cg-header {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.cg-tag {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; flex-shrink: 0;
+}
+.cg-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.cg-steps {
+  display: flex; flex-direction: column; gap: 14px;
+  padding-left: 20px; margin: 0;
+}
+.cg-step { color: var(--text2); }
+.cg-step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.cg-step-text  { font-size: 12px; line-height: 1.65; }
 .anatomy-btn {
-  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 5px 12px;
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
   background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.25);
   border-radius: 20px; font-family: 'Inter', sans-serif;
-  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
   cursor: pointer; color: var(--accent2); transition: all 0.2s;
 }
 .anatomy-btn:hover { background: rgba(79,142,247,0.2); border-color: var(--accent); }
-.anatomy-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.anatomy-btn svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
 .divider { width: 40px; height: 1.5px; background: linear-gradient(90deg,var(--accent),var(--cyan)); margin: 20px 0; border-radius: 1px; }
 

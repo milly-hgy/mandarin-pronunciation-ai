@@ -430,7 +430,7 @@ const ANATOMY = {
   iao:{
     tag:'Compound Final Error · -iao',title:'-iao Glide: Lip & Tongue Shape',
     sub:'Open wide on -a, then glide smoothly to rounded -o.',
-    videoTitle:'-iao Compound Final — IwXyiWNv1Ts (4:20)',
+    videoTitle:'-iao Compound Final',
     videoSrc:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260',
     steps:[
       {title:'Start with a High Tongue — "ee" (i)',text:'Begin with the tongue high and front, mouth slightly open, as if saying "ee" (yī). This is the on-glide. Many learners skip this and start too open.'},
@@ -846,8 +846,8 @@ function buildUtterance(syllables) {
         if (iframe)  { iframe.src = s.videoSrc; iframe.style.opacity = '1'; }
         if (ph)      ph.style.display = 'none';
         if (caption) caption.textContent = s.videoLabel || 'Targeted tutorial loaded.';
-        // Open anatomy guide + update inline card
-        if (s.anatomyKey && ANATOMY[s.anatomyKey]) { openAnatomy(s.anatomyKey); updateAicCard(s.anatomyKey); }
+        // Open anatomy guide modal
+        if (s.anatomyKey && ANATOMY[s.anatomyKey]) { openAnatomy(s.anatomyKey); }
         // Show video section and scroll
         const vs = document.getElementById('videoSection');
         if (vs) { vs.classList.add('visible'); setTimeout(()=>vs.scrollIntoView({behavior:'smooth'}), 50); }
@@ -923,46 +923,55 @@ function loadTargetedVideo(src, label) {
 }
 /* Cards: video + anatomy key mapping */
 var CARD_MAP = [
-  {fb:'fbNeng', ab:'abNeng', vb:'btnNeng', akey:'tone2', src:'https://www.youtube.com/embed/n_Cj3aOSI1w?start=433', label:'2nd Tone Rising — neng (n\u00e9ng)'},
-  {fb:'fbXing', ab:'abXing', vb:'btnXing', akey:'xsh',   src:'https://www.youtube.com/embed/05BMKdxHjp8?start=33',  label:'Initial x Position — xing (x\u012bng)'},
-  {fb:'fbXiao', ab:'abXiao', vb:'btnXiao', akey:'iao',   src:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260', label:'-iao Compound Final — xiao (xi\u00e0o)'},
+  {ab:'abNeng', vb:'btnNeng', guide:'guideNeng', akey:'tone2', src:'https://www.youtube.com/embed/n_Cj3aOSI1w?start=433', label:'2nd Tone Rising \u2014 neng (n\u00e9ng)'},
+  {ab:'abXing', vb:'btnXing', guide:'guideXing', akey:'xsh',   src:'https://www.youtube.com/embed/05BMKdxHjp8?start=33',  label:'Initial x Position \u2014 xing (x\u012bng)'},
+  {ab:'abXiao', vb:'btnXiao', guide:'guideXiao', akey:'iao',   src:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260', label:'-iao Compound Final \u2014 xiao (xi\u00e0o)'},
 ];
-function initIvpCards() {
-  CARD_MAP.forEach(function(c) {
-    var fb = document.getElementById(c.fb);
-    var ab = document.getElementById(c.ab);
-    var vb = document.getElementById(c.vb);
-    if (fb) fb.addEventListener('click', function() { updateAicCard(c.akey); });
-    if (ab) ab.addEventListener('click', function(e) { e.stopPropagation(); openAnatomy(c.akey); updateAicCard(c.akey); });
-    if (vb) vb.addEventListener('click', function(e) { e.stopPropagation(); loadTargetedVideo(c.src, c.label); });
-  });
-}
-function updateAicCard(key) {
+
+/* Populate a card-guide div with step-by-step content from ANATOMY data */
+function populateCardGuide(guideEl, key) {
   var anat = ANATOMY[key];
   if (!anat) return;
-  var tag   = document.getElementById('aicTag');
-  var title = document.getElementById('aicTitle');
-  var desc  = document.getElementById('aicDesc');
-  var hl    = document.getElementById('aicHighlight');
-  var af    = document.getElementById('aicAirFlow');
-  if (tag)   tag.textContent   = anat.tag;
-  if (title) title.textContent = anat.title;
-  if (desc && anat.steps.length) {
-    var s0 = anat.steps[0];
-    desc.innerHTML = '<div class="aic-step-num">Step 1 of ' + anat.steps.length + '</div>'
-      + '<div class="aic-step-title">' + s0.title + '</div>'
-      + '<div class="aic-step-text">' + s0.text.substring(0, 130) + (s0.text.length > 130 ? '\u2026' : '') + '</div>';
+  var html = '<div class="cg-header"><span class="cg-tag">' + anat.tag + '</span><span class="cg-title">' + anat.title + '</span></div>'
+    + '<ol class="cg-steps">';
+  anat.steps.forEach(function(s) {
+    html += '<li class="cg-step"><div class="cg-step-title">' + s.title + '</div>'
+          + '<div class="cg-step-text">' + s.text + '</div></li>';
+  });
+  html += '</ol>';
+  guideEl.innerHTML = html;
+}
+
+/* Toggle the inline guide inside a specific feedback card */
+function toggleCardGuide(guideId, key) {
+  var guideEl = document.getElementById(guideId);
+  if (!guideEl) return;
+  if (guideEl.hidden) {
+    if (!guideEl.dataset.populated) {
+      populateCardGuide(guideEl, key);
+      guideEl.dataset.populated = '1';
+    }
+    guideEl.hidden = false;
+  } else {
+    guideEl.hidden = true;
   }
-  if (hl) {
-    hl.setAttribute('opacity', '0.8');
-    var cx = 80, cy = 118;
-    if (key === 'xsh')  { cx = 48; cy = 118; if (af) af.setAttribute('opacity','1'); }
-    else if (key === 'iao') { cx = 80; cy = 148; }
-    else if (key === 'tone2' || key === 'tone3') { cx = 80; cy = 64; }
-    hl.setAttribute('cx', cx);
-    hl.setAttribute('cy', cy);
-  }
-  if (af && key !== 'xsh') af.setAttribute('opacity', '0');
+}
+
+function initIvpCards() {
+  CARD_MAP.forEach(function(c) {
+    var ab = document.getElementById(c.ab);
+    var vb = document.getElementById(c.vb);
+    /* Anatomy btn: toggle inline guide inside the card */
+    if (ab) ab.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleCardGuide(c.guide, c.akey);
+    });
+    /* Video btn: load targeted YouTube video */
+    if (vb) vb.addEventListener('click', function(e) {
+      e.stopPropagation();
+      loadTargetedVideo(c.src, c.label);
+    });
+  });
 }
 
 /* ═══════════════════════════════════════════

@@ -282,47 +282,8 @@
   <div class="ai-feedback-container analysis-section" id="analysisPanel">
     <div class="panel-title">AI Feedback + Linked Videos</div>
 
-    <!-- ── Inline Articulatory Guide Card (updates on syllable click) ── -->
-    <div class="aic-card" id="aicCard">
-      <div class="aic-header">
-        <span class="aic-tag" id="aicTag">Articulatory Guide</span>
-        <span class="aic-title" id="aicTitle">Click a highlighted syllable</span>
-      </div>
-      <div class="aic-body">
-        <div class="aic-svg-col">
-          <svg id="aicSvg" viewBox="0 0 160 180">
-            <ellipse cx="80" cy="58" rx="52" ry="48" fill="#eef2f8" stroke="rgba(30,41,59,0.12)" stroke-width="1.5"/>
-            <ellipse cx="80" cy="44" rx="11" ry="7" fill="rgba(59,130,246,0.10)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
-            <path d="M42 78 Q80 68 118 78" stroke="rgba(30,41,59,0.22)" stroke-width="1.5" fill="none"/>
-            <path d="M102 78 Q112 92 108 102" stroke="rgba(30,41,59,0.20)" stroke-width="1.5" fill="none"/>
-            <ellipse cx="108" cy="106" rx="4" ry="5" fill="rgba(239,68,68,0.40)"/>
-            <path id="aicTonguePath" d="M32 118 Q52 108 72 108 Q92 108 108 118 L108 126 Q92 130 72 130 Q52 130 32 126 Z" fill="rgba(239,68,68,0.20)" stroke="rgba(239,68,68,0.45)" stroke-width="1.5"/>
-            <ellipse id="aicTongueTip" cx="34" cy="120" rx="6" ry="4" fill="rgba(239,68,68,0.38)"/>
-            <path id="aicUpperLip" d="M44 138 Q80 132 116 138 Q80 145 44 138" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
-            <path id="aicLowerLip" d="M44 145 Q80 140 116 145 Q116 155 80 158 Q44 155 44 145" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
-            <rect x="52" y="135" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
-            <rect x="52" y="143" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
-            <g id="aicAirFlow" opacity="0">
-              <path d="M112 116 L134 116" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,2"/>
-              <polygon points="132,113 138,116 132,119" fill="var(--accent)"/>
-            </g>
-            <circle id="aicHighlight" cx="80" cy="118" r="13" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3" opacity="0">
-              <animate attributeName="r" values="12;16;12" dur="1.6s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.6s" repeatCount="indefinite"/>
-            </circle>
-            <text x="2" y="46" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">nasal</text>
-            <text x="2" y="80" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">palate</text>
-            <text x="2" y="120" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">tongue</text>
-            <text x="2" y="142" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">lips</text>
-          </svg>
-        </div>
-        <div class="aic-desc" id="aicDesc">
-          <div class="aic-placeholder">Click any colored syllable above or an error card below to load targeted articulatory guidance.</div>
-        </div>
-      </div>
-    </div>
-
     <!-- ── Error Feedback Cards ── -->
+
     <div class="feedback-list">
 
       <div class="feedback-item error" id="fbNeng">
@@ -334,6 +295,7 @@
             <button class="anatomy-btn" id="abNeng"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
             <button class="vid-btn" id="btnNeng"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
           </div>
+          <div class="card-guide" id="guideNeng" hidden></div>
         </div>
       </div>
 
@@ -346,6 +308,7 @@
             <button class="anatomy-btn" id="abXing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
             <button class="vid-btn" id="btnXing"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
           </div>
+          <div class="card-guide" id="guideXing" hidden></div>
         </div>
       </div>
 
@@ -358,6 +321,7 @@
             <button class="anatomy-btn" id="abXiao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
             <button class="vid-btn" id="btnXiao"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
           </div>
+          <div class="card-guide" id="guideXiao" hidden></div>
         </div>
       </div>
 
@@ -868,7 +832,7 @@ const ANATOMY = {
   tone2:{
     tag:'Tone Error · 2nd Tone',title:'Rising 陽平 (35)',
     sub:'Start low at 3, rise steadily to 5. Your contour was too flat.',
-    videoTitle:'2nd Tone Rising Contour — n_Cj3aOSI1w (7:13)',
+    videoTitle:'2nd Tone Rising Contour',
     videoSrc:'https://www.youtube.com/embed/n_Cj3aOSI1w?start=433',
     steps:[
       {title:'Start Low — Pitch Level 3',text:'Begin from a mid-low pitch (about 35% of your range). Resist the urge to start flat. The low starting point is what distinguishes this from the 1st tone.'},
@@ -887,7 +851,7 @@ const ANATOMY = {
   iao:{
     tag:'Compound Final Error · -iao',title:'-iao Glide: Lip & Tongue Shape',
     sub:'Open wide on -a, then glide smoothly to rounded -o.',
-    videoTitle:'-iao Compound Final — IwXyiWNv1Ts (4:20)',
+    videoTitle:'-iao Compound Final',
     videoSrc:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260',
     steps:[
       {title:'Start with a High Tongue — "ee" (i)',text:'Begin with the tongue high and front, mouth slightly open, as if saying "ee" (yī). This is the on-glide. Many learners skip this and start too open.'},
@@ -935,7 +899,8 @@ const ANATOMY = {
   xsh:{
     tag:'Initial Error · x vs. sh',title:'x (palatal) vs. sh (retroflex)',
     sub:'Tongue blade position determines everything',
-    videoTitle:'x vs. sh: Tongue Position (5:47)',
+    videoTitle:'x vs. sh: Tongue Position',
+    videoSrc:'https://www.youtube.com/embed/05BMKdxHjp8?start=35',
     steps:[
       {title:'For "x" — Blade Forward',text:'Place the tongue BLADE (not the tip) just behind the upper front teeth. The tongue tip must rest against lower teeth. Hissing friction from the front of the mouth.'},
       {title:'For "sh" — Tip Curled Back',text:'Curl the tongue TIP upward and slightly backward toward the hard palate. Do not touch — just approach. Friction from mid-mouth, not the front.'},
@@ -1410,6 +1375,9 @@ function buildUtterance(syllables) {
   });
 }
 
+/* ── Title sanitiser: strips everything from the first dash/em-dash onward ── */
+const cleanTitle = (str) => (str || '').replace(/\s+[\-\u2014].*$/, '').trim();
+
 /* ═══ ANATOMY MODAL ═══ */
 function openAnatomy(key){
   if (!ANATOMY[key]) return;
@@ -1417,7 +1385,7 @@ function openAnatomy(key){
   document.getElementById('modalTag').textContent=currentAnat.tag;
   document.getElementById('modalTitle').textContent=currentAnat.title;
   document.getElementById('modalSub').textContent=currentAnat.sub;
-  document.getElementById('modalVideoTitle').textContent=currentAnat.videoTitle;
+  document.getElementById('modalVideoTitle').textContent=cleanTitle(currentAnat.videoTitle);
   // Wire up modal video link
   const mvl = document.querySelector('.modal-video-link');
   if (mvl && currentAnat.videoSrc) {
@@ -1429,7 +1397,7 @@ function openAnatomy(key){
       const vs      = document.getElementById('videoSection');
       if (iframe)  { iframe.src = currentAnat.videoSrc; iframe.style.opacity='1'; }
       if (ph)      ph.style.display = 'none';
-      if (caption) caption.textContent = currentAnat.videoTitle;
+      if (caption) caption.textContent = cleanTitle(currentAnat.videoTitle);
       if (vs)      vs.classList.add('visible');
       closeAnatomy();
       setTimeout(()=>vs.scrollIntoView({behavior:'smooth'}), 100);
