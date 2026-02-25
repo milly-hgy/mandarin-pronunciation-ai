@@ -278,7 +278,7 @@ function buildSyllablesFromSTT(text) {
     'vowel-error':   '⚠ Vowel Error: vowel shape or lip position incorrect'
   };
 
-  return chars.slice(0, 10).map((char, i) => {
+  return chars.map((char, i) => {
     let pinyin;
     if (window.pinyinPro) {
       // Dynamic conversion via pinyin-pro — works for any Chinese character
