@@ -195,7 +195,7 @@ nav a:hover { color: var(--text); }
 }
 
 .hero-left::before {
-  content: '声';
+  content: '聲';
   font-family: 'Noto Serif SC', serif;
   font-size: 520px; font-weight: 700;
   background: linear-gradient(135deg, rgba(79,142,247,0.06), transparent);
@@ -283,7 +283,7 @@ nav a:hover { color: var(--text); }
   border-radius: var(--radius-lg);
 }
 .hero-right::before {
-  content: '韵'; font-family: 'Noto Serif SC', serif;
+  content: '韻'; font-family: 'Noto Serif SC', serif;
   font-size: 480px; font-weight: 700;
   background: linear-gradient(135deg, rgba(79,142,247,0.06), transparent);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
@@ -1069,7 +1069,7 @@ footer {
   position: relative; overflow: hidden;
 }
 footer::before {
-  content: '声韵';
+  content: '聲韻';
   font-family: 'Noto Serif SC', serif;
   font-size: 180px; font-weight: 700; color: white; opacity: 0.05;
   position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
