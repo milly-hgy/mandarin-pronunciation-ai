@@ -573,9 +573,9 @@ input[type="file"] { display: none; }
 .badge-good { background: rgba(52,216,160,0.15); color: var(--jade); border: 1px solid rgba(52,216,160,0.3); }
 .badge-warn { background: rgba(240,180,41,0.15); color: var(--gold); border: 1px solid rgba(240,180,41,0.3); }
 .badge-bad  { background: rgba(232,80,58,0.15);  color: var(--vermillion); border: 1px solid rgba(232,80,58,0.3); }
-.contour-canvas-wrap { padding: 20px 20px 8px; }
+.contour-canvas-wrap { padding: 20px 24px 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 canvas.contour-canvas { width: 100%; height: 112px; display: block; }
-.contour-legend { display: flex; gap: 18px; padding: 0 20px 16px; }
+.contour-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 0 20px 16px; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 1px; color: var(--text3); }
 .legend-line { width: 20px; height: 2.5px; border-radius: 1px; }
 
@@ -1324,58 +1324,61 @@ footer::after {
    MOBILE — max-width: 768px
 ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* 1. Prevent overall page horizontal shaking */
-    body {
-        overflow-x: hidden;
-        width: 100%;
-    }
+  /* ── Prevent horizontal overflow ── */
+  body { overflow-x: hidden; }
 
-    /* 2. Adjust main container padding */
-    .container {
-        width: 95% !important;
-        padding: 10px !important;
-        margin: 0 auto;
-    }
+  /* ── Section padding: reduce 56px → 20px side padding ── */
+  .hero,
+  .main-section,
+  .contour-section,
+  .score-breakdown-section,
+  .results-section { padding-left: 20px !important; padding-right: 20px !important; }
 
-    /* 3. Fix text overflow for large titles */
-    h1, .analysis-title {
-        font-size: 1.8rem !important;
-        line-height: 1.2;
-        word-wrap: break-word;
-    }
+  /* ── Breakdown card ── */
+  .breakdown-card { padding: 24px 20px; box-sizing: border-box; }
 
-    /* 4. Make charts scrollable instead of being squashed */
-    .chart-container, .tone-contour-reference {
-        width: 100%;
-        overflow-x: auto !important;
-        display: block;
-        -webkit-overflow-scrolling: touch;
-    }
+  /* ── Score ring + header text: stack vertically ── */
+  .breakdown-header { flex-direction: column; align-items: flex-start; gap: 20px; margin-bottom: 24px; }
+  .overall-score-ring { flex-direction: row; align-items: center; gap: 20px; margin-right: 0; }
+  .ring-wrapper { width: 90px; height: 90px; }
+  .ring-score-text { font-size: 22px; }
 
-    /* 5. Stack buttons vertically to avoid overlapping */
-    .button-group, .action-buttons {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        width: 100%;
-    }
+  /* ── Typography ── */
+  .hero-title { font-size: 2rem; }
+  .section-title { font-size: 1.8rem; word-wrap: break-word; }
+  .bd-title { font-size: 1.4rem; line-height: 1.2; }
 
-    .btn, button {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 12px !important;
-    }
+  /* ── "What you said" box: wrap long Chinese text ── */
+  .target-sentence { padding: 14px 16px; }
+  .ts-text { font-size: 16px; letter-spacing: 1px; word-break: break-all; white-space: normal; overflow-wrap: break-word; }
 
-    /* 6. Ensure 3D cards fit the screen width */
-    .card-3d, .feedback-card {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        margin-bottom: 20px;
-    }
+  /* ── Analyzed Utterance syllable units ── */
+  .utterance-display { gap: 4px; }
+  .syl-char { font-size: 26px; }
 
-    /* 7. Shrink large images or SVGs to fit */
-    svg, img {
-        max-width: 100% !important;
-        height: auto !important;
-    }
+  /* ── AI feedback section ── */
+  .analysis-section { padding: 20px 16px; }
+  .feedback-item { flex-direction: column; padding: 18px 16px; gap: 12px; }
+  .feedback-title { font-size: 17px; }
+  .feedback-desc { font-size: 14px; }
+
+  /* ── Feedback buttons: keep inline, never full-width ── */
+  .feedback-actions { flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .vid-btn, .anatomy-btn { width: auto !important; margin: 0 !important; }
+
+  /* ── Tone summary card ── */
+  .tone-summary-card { padding: 20px 16px; margin: 16px 0; }
+
+  /* ── Score grid: 2 columns instead of 3 ── */
+  .score-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── Contour chart ── */
+  .contour-card { padding: 0; }
+  .contour-header { padding: 14px 16px; flex-wrap: wrap; gap: 6px; }
+  .contour-meta { text-align: left; }
+  .contour-canvas-wrap { padding: 12px 12px 4px; }
+  .contour-legend { padding: 8px 12px 14px; gap: 8px 14px; }
+
+  /* ── Images only (not SVG — preserves ring and anatomy diagrams) ── */
+  img { max-width: 100%; height: auto; }
 }
