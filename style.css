@@ -1273,63 +1273,64 @@ footer::after {
   padding-top: 16px; border-top: 1px solid var(--glass-border); margin-top: 16px;
 }
 .ph-leg-item { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
+.ph-swatch { width: 12px; height: 12px; border-radius: 3px; }
 
 /* ═══════════════════════════════════════════
    MOBILE — max-width: 768px
 ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
-    /* 1. 確保最外層容器不會左右滑動 */
+    /* 1. Prevent overall page horizontal shaking */
     body {
         overflow-x: hidden;
+        width: 100%;
     }
 
+    /* 2. Adjust main container padding */
     .container {
-        width: 92% !important;
-        margin: 10px auto;
-        padding: 15px;
-        flex-direction: column; /* 如果有並排的元素，改為上下排列 */
+        width: 95% !important;
+        padding: 10px !important;
+        margin: 0 auto;
     }
 
-    .card-3d {
-        width: 100%;         /* 讓 3D 卡片寬度自適應 */
-        margin-bottom: 20px;
-    }
-
-    /* 2. 解決「分析中」文字過大問題 */
+    /* 3. Fix text overflow for large titles */
     h1, .analysis-title {
         font-size: 1.8rem !important;
-        word-break: break-all; /* 防止長單字撐開版面 */
+        line-height: 1.2;
+        word-wrap: break-word;
     }
 
-    /* 3. 處理音高圖表（Pitch Contour）被壓縮問題 */
-    .chart-container {
+    /* 4. Make charts scrollable instead of being squashed */
+    .chart-container, .tone-contour-reference {
         width: 100%;
-        overflow-x: auto; /* 讓圖表在小螢幕可以左右滑動，而不是被壓扁 */
+        overflow-x: auto !important;
+        display: block;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* 4. 讓並排的按鈕在手機上改為上下堆疊，避免擠壓 */
-    .button-group {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    /* 5. Stack buttons vertically to avoid overlapping */
+    .button-group, .action-buttons {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100%;
     }
 
-    .btn {
-        width: 100%; /* 按鈕佔滿寬度，比較好按 */
-        margin-left: 0 !important;
+    .btn, button {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12px !important;
     }
 
-    /* 5. 調整 AI 反饋卡片內的文字間距 */
-    .feedback-card {
-        padding: 15px;
-        font-size: 0.95rem; /* 稍微縮小字體以容納更多內容 */
+    /* 6. Ensure 3D cards fit the screen width */
+    .card-3d, .feedback-card {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 20px;
     }
 
-    /* 6. 防止圖片或 SVG 超出卡片 */
-    img, svg {
-        max-width: 100%;
-        height: auto;
+    /* 7. Shrink large images or SVGs to fit */
+    svg, img {
+        max-width: 100% !important;
+        height: auto !important;
     }
 }
-.ph-swatch { width: 12px; height: 12px; border-radius: 3px; }
