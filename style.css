@@ -1273,4 +1273,24 @@ footer::after {
   padding-top: 16px; border-top: 1px solid var(--glass-border); margin-top: 16px;
 }
 .ph-leg-item { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   MOBILE — max-width: 768px
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;          /* 讓容器佔滿螢幕 */
+        padding: 10px;       /* 縮小內距 */
+        flex-direction: column; /* 如果有並排的元素，改為上下排列 */
+    }
+
+    .card-3d {
+        width: 100%;         /* 讓 3D 卡片寬度自適應 */
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;   /* 縮小手機版的標題字體 */
+    }
+}
 .ph-swatch { width: 12px; height: 12px; border-radius: 3px; }
