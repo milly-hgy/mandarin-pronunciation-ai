@@ -254,8 +254,9 @@
     </div>
   </div>
 
-  <div class="analysis-section" id="analysisPanel">
-    <div class="analysis-left">
+  <!-- ── Tone Summary Card ── -->
+  <div class="tone-summary-card">
+    <div class="tone-accuracy-container">
       <div class="panel-title">Tone Accuracy</div>
       <div class="tones-grid">
         <div class="tone-row"><div class="tone-label">1st <span style="font-size:9px;opacity:0.5">ˉ</span></div><div class="tone-bar-bg"><div class="tone-bar-fill t1" data-w="92%"></div></div><div class="tone-pct">92%</div></div>
@@ -264,7 +265,8 @@
         <div class="tone-row"><div class="tone-label">4th <span style="font-size:9px;opacity:0.5">ˋ</span></div><div class="tone-bar-bg"><div class="tone-bar-fill t4" data-w="84%"></div></div><div class="tone-pct">84%</div></div>
         <div class="tone-row"><div class="tone-label">5th <span style="font-size:9px;opacity:0.5">·</span></div><div class="tone-bar-bg"><div class="tone-bar-fill t5" data-w="96%"></div></div><div class="tone-pct">96%</div></div>
       </div>
-      <div class="divider"></div>
+    </div>
+    <div class="tone-contour-reference">
       <div class="panel-title">Tone Contour Reference</div>
       <div class="tone-curves">
         <div class="tone-curve-item"><svg class="tone-svg" viewBox="0 0 50 40"><line x1="8" y1="12" x2="42" y2="12" stroke="#34d8a0" stroke-width="2.5" stroke-linecap="round"/></svg><div class="tone-curve-label">1st</div></div>
@@ -274,103 +276,102 @@
         <div class="tone-curve-item"><svg class="tone-svg" viewBox="0 0 50 40"><circle cx="25" cy="22" r="3" fill="#b89af8"/></svg><div class="tone-curve-label">5th</div></div>
       </div>
     </div>
-    <div class="analysis-right">
-      <div class="panel-title">AI Feedback + Linked Videos</div>
+  </div>
 
-      <!-- ── Inline Articulatory Guide Card (updates on syllable click) ── -->
-      <div class="aic-card" id="aicCard">
-        <div class="aic-header">
-          <span class="aic-tag" id="aicTag">Articulatory Guide</span>
-          <span class="aic-title" id="aicTitle">Click a highlighted syllable</span>
-        </div>
-        <div class="aic-body">
-          <div class="aic-svg-col">
-            <!-- Sagittal cross-section — light theme -->
-            <svg id="aicSvg" viewBox="0 0 160 180">
-              <ellipse cx="80" cy="58" rx="52" ry="48" fill="#eef2f8" stroke="rgba(30,41,59,0.12)" stroke-width="1.5"/>
-              <ellipse cx="80" cy="44" rx="11" ry="7" fill="rgba(59,130,246,0.10)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
-              <path d="M42 78 Q80 68 118 78" stroke="rgba(30,41,59,0.22)" stroke-width="1.5" fill="none"/>
-              <path d="M102 78 Q112 92 108 102" stroke="rgba(30,41,59,0.20)" stroke-width="1.5" fill="none"/>
-              <ellipse cx="108" cy="106" rx="4" ry="5" fill="rgba(239,68,68,0.40)"/>
-              <path id="aicTonguePath" d="M32 118 Q52 108 72 108 Q92 108 108 118 L108 126 Q92 130 72 130 Q52 130 32 126 Z" fill="rgba(239,68,68,0.20)" stroke="rgba(239,68,68,0.45)" stroke-width="1.5"/>
-              <ellipse id="aicTongueTip" cx="34" cy="120" rx="6" ry="4" fill="rgba(239,68,68,0.38)"/>
-              <path id="aicUpperLip" d="M44 138 Q80 132 116 138 Q80 145 44 138" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
-              <path id="aicLowerLip" d="M44 145 Q80 140 116 145 Q116 155 80 158 Q44 155 44 145" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
-              <rect x="52" y="135" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
-              <rect x="52" y="143" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
-              <g id="aicAirFlow" opacity="0">
-                <path d="M112 116 L134 116" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,2"/>
-                <polygon points="132,113 138,116 132,119" fill="var(--accent)"/>
-              </g>
-              <circle id="aicHighlight" cx="80" cy="118" r="13" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3" opacity="0">
-                <animate attributeName="r" values="12;16;12" dur="1.6s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.6s" repeatCount="indefinite"/>
-              </circle>
-              <text x="2" y="46" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">nasal</text>
-              <text x="2" y="80" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">palate</text>
-              <text x="2" y="120" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">tongue</text>
-              <text x="2" y="142" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">lips</text>
-            </svg>
-          </div>
-          <div class="aic-desc" id="aicDesc">
-            <div class="aic-placeholder">Click any colored syllable above or an error card below to load targeted articulatory guidance.</div>
-          </div>
-        </div>
+  <!-- ── AI Feedback — full width ── -->
+  <div class="ai-feedback-container analysis-section" id="analysisPanel">
+    <div class="panel-title">AI Feedback + Linked Videos</div>
+
+    <!-- ── Inline Articulatory Guide Card (updates on syllable click) ── -->
+    <div class="aic-card" id="aicCard">
+      <div class="aic-header">
+        <span class="aic-tag" id="aicTag">Articulatory Guide</span>
+        <span class="aic-title" id="aicTitle">Click a highlighted syllable</span>
       </div>
-
-      <!-- ── Error Feedback Cards ── -->
-      <div class="feedback-list">
-
-        <!-- 能 néng — Tone 2nd Rising -->
-        <div class="feedback-item error" id="fbNeng">
-          <div class="feedback-icon error">!</div>
-          <div class="feedback-content">
-            <div class="feedback-title">2nd tone too flat &#8212; 能 (n&#233;ng)</div>
-            <div class="feedback-desc">Your rising contour plateaued at mid-pitch. The 2nd tone must rise continuously from level 3 to 5. Think: English “Really?"</div>
-            <div class="feedback-actions">
-              <button class="anatomy-btn" id="abNeng"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
-              <button class="vid-btn" id="btnNeng"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
-            </div>
-          </div>
+      <div class="aic-body">
+        <div class="aic-svg-col">
+          <svg id="aicSvg" viewBox="0 0 160 180">
+            <ellipse cx="80" cy="58" rx="52" ry="48" fill="#eef2f8" stroke="rgba(30,41,59,0.12)" stroke-width="1.5"/>
+            <ellipse cx="80" cy="44" rx="11" ry="7" fill="rgba(59,130,246,0.10)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
+            <path d="M42 78 Q80 68 118 78" stroke="rgba(30,41,59,0.22)" stroke-width="1.5" fill="none"/>
+            <path d="M102 78 Q112 92 108 102" stroke="rgba(30,41,59,0.20)" stroke-width="1.5" fill="none"/>
+            <ellipse cx="108" cy="106" rx="4" ry="5" fill="rgba(239,68,68,0.40)"/>
+            <path id="aicTonguePath" d="M32 118 Q52 108 72 108 Q92 108 108 118 L108 126 Q92 130 72 130 Q52 130 32 126 Z" fill="rgba(239,68,68,0.20)" stroke="rgba(239,68,68,0.45)" stroke-width="1.5"/>
+            <ellipse id="aicTongueTip" cx="34" cy="120" rx="6" ry="4" fill="rgba(239,68,68,0.38)"/>
+            <path id="aicUpperLip" d="M44 138 Q80 132 116 138 Q80 145 44 138" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
+            <path id="aicLowerLip" d="M44 145 Q80 140 116 145 Q116 155 80 158 Q44 155 44 145" fill="rgba(59,130,246,0.22)" stroke="rgba(59,130,246,0.40)" stroke-width="1"/>
+            <rect x="52" y="135" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
+            <rect x="52" y="143" width="56" height="3" rx="1" fill="rgba(255,255,255,0.90)" stroke="rgba(30,41,59,0.12)" stroke-width="0.5"/>
+            <g id="aicAirFlow" opacity="0">
+              <path d="M112 116 L134 116" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <polygon points="132,113 138,116 132,119" fill="var(--accent)"/>
+            </g>
+            <circle id="aicHighlight" cx="80" cy="118" r="13" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3" opacity="0">
+              <animate attributeName="r" values="12;16;12" dur="1.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.6s" repeatCount="indefinite"/>
+            </circle>
+            <text x="2" y="46" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">nasal</text>
+            <text x="2" y="80" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">palate</text>
+            <text x="2" y="120" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">tongue</text>
+            <text x="2" y="142" font-size="6" fill="rgba(30,41,59,0.32)" font-family="monospace">lips</text>
+          </svg>
         </div>
-
-        <!-- 星 xīng — Initial x -->
-        <div class="feedback-item warning" id="fbXing">
-          <div class="feedback-icon warning">~</div>
-          <div class="feedback-content">
-            <div class="feedback-title">Initial x too retracted &#8212; 星 (x&#299;ng)</div>
-            <div class="feedback-desc">x is palatal: tongue BLADE near upper front teeth, tip stays on lower teeth. Not curled back like “sh".</div>
-            <div class="feedback-actions">
-              <button class="anatomy-btn" id="abXing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
-              <button class="vid-btn" id="btnXing"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
-            </div>
-          </div>
+        <div class="aic-desc" id="aicDesc">
+          <div class="aic-placeholder">Click any colored syllable above or an error card below to load targeted articulatory guidance.</div>
         </div>
-
-        <!-- 校 xiào — Compound -iao -->
-        <div class="feedback-item warning" id="fbXiao">
-          <div class="feedback-icon warning">~</div>
-          <div class="feedback-content">
-            <div class="feedback-title">-iao glide too short &#8212; 校 (xi&#224;o)</div>
-            <div class="feedback-desc">-iao needs three positions: high-front i &#8594; open a &#8594; rounded o. The a was too short and o-rounding was missing.</div>
-            <div class="feedback-actions">
-              <button class="anatomy-btn" id="abXiao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
-              <button class="vid-btn" id="btnXiao"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="feedback-item ok">
-          <div class="feedback-icon ok">&#10003;</div>
-          <div class="feedback-content">
-            <div class="feedback-title">1st, 3rd &amp; 4th tones: excellent</div>
-            <div class="feedback-desc">下、六、學、有、一、音、樂、會、望、來 — tone contours are natural and consistent. 17 of 20 syllables at native clarity.</div>
-          </div>
-        </div>
-
       </div>
     </div>
+
+    <!-- ── Error Feedback Cards ── -->
+    <div class="feedback-list">
+
+      <div class="feedback-item error" id="fbNeng">
+        <div class="feedback-icon error">!</div>
+        <div class="feedback-content">
+          <div class="feedback-title">2nd tone too flat &#8212; 能 (n&#233;ng)</div>
+          <div class="feedback-desc">Your rising contour plateaued at mid-pitch. The 2nd tone must rise continuously from level 3 to 5. Think: English “Really?”</div>
+          <div class="feedback-actions">
+            <button class="anatomy-btn" id="abNeng"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
+            <button class="vid-btn" id="btnNeng"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback-item warning" id="fbXing">
+        <div class="feedback-icon warning">~</div>
+        <div class="feedback-content">
+          <div class="feedback-title">Initial x too retracted &#8212; 星 (x&#299;ng)</div>
+          <div class="feedback-desc">x is palatal: tongue BLADE near upper front teeth, tip stays on lower teeth. Not curled back like “sh”.</div>
+          <div class="feedback-actions">
+            <button class="anatomy-btn" id="abXing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
+            <button class="vid-btn" id="btnXing"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback-item warning" id="fbXiao">
+        <div class="feedback-icon warning">~</div>
+        <div class="feedback-content">
+          <div class="feedback-title">-iao glide too short &#8212; 校 (xi&#224;o)</div>
+          <div class="feedback-desc">-iao needs three positions: high-front i &#8594; open a &#8594; rounded o. The a was too short and o-rounding was missing.</div>
+          <div class="feedback-actions">
+            <button class="anatomy-btn" id="abXiao"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>Articulatory Guide</button>
+            <button class="vid-btn" id="btnXiao"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Fix</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback-item ok">
+        <div class="feedback-icon ok">&#10003;</div>
+        <div class="feedback-content">
+          <div class="feedback-title">Great work!</div>
+          <div class="feedback-desc">You mastered 17 out of 20 syllables! Words like ‘下’, ‘六’, and ‘學’ sound perfectly natural.</div>
+        </div>
+      </div>
+
+    </div>
   </div>
+
 </section>
 
 <!-- VIDEO SECTION — YouTube Intervention -->

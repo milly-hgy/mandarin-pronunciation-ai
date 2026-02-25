@@ -848,7 +848,7 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 .aic-tag  { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); font-weight: 600; flex-shrink: 0; }
 .aic-title { font-size: 12px; font-weight: 600; color: var(--text); }
 .aic-body {
-  display: grid; grid-template-columns: 110px 1fr;
+  display: flex; flex-direction: row; gap: 24px;
   min-height: 130px;
 }
 .aic-svg-col {
@@ -869,16 +869,39 @@ canvas.contour-canvas { width: 100%; height: 112px; display: block; }
 .aic-step-text { font-size: 11px; color: var(--text2); line-height: 1.65; }
 
 /* ═══════════════════════════════════════════
-   ANALYSIS PANEL
+   TONE SUMMARY CARD + ANALYSIS PANEL
 ═══════════════════════════════════════════ */
+
+/* Single merged card: Tone Accuracy on top, Tone Contour Reference below */
+.tone-summary-card {
+  display: flex; flex-direction: column; gap: 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  box-shadow: var(--neu-shadow-lg);
+  margin: 24px 0;
+}
+.tone-contour-reference {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 24px;
+}
+.tone-contour-reference .tone-curves {
+  display: flex; justify-content: space-around; width: 100%;
+}
+/* Smaller icons emphasise this is a reference legend */
+.tone-summary-card .tone-svg { width: 40px; height: 30px; }
+
+/* AI Feedback — full width column below the stats bar */
 .analysis-section {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 40px;
+  display: flex; flex-direction: column; gap: 20px; margin-top: 0;
   background: var(--bg);
-  border: none; border-radius: var(--radius-lg); overflow: hidden;
+  border: none; border-radius: var(--radius-lg);
+  padding: 36px 40px;
   box-shadow: var(--neu-shadow-lg);
 }
-.analysis-left { padding: 36px 40px; border-right: 1px solid var(--glass-border); }
-.analysis-right { padding: 36px 40px; }
 .panel-title {
   font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--text3);
   margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
@@ -1133,9 +1156,10 @@ footer::after {
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media(max-width:960px){
-  .hero,.contour-grid,.analysis-section,.modal-grid,.bd-cat{ grid-template-columns:1fr; }
+  .hero,.contour-grid,.modal-grid,.bd-cat{ grid-template-columns:1fr; }
   .hero-right{ min-height:500px; }
-  .analysis-left{ border-right:none; border-bottom:1px solid var(--glass-border); }
+  .tone-summary-card{ padding:20px; }
+  .tone-contour-reference .tone-curves{ flex-wrap:wrap; gap:12px; }
   .video-grid,.progress-grid{ grid-template-columns:1fr; }
   header,.hero-left,.app-shell,.main-section,.video-section,.contour-section,.results-section,.score-breakdown-section{ padding-left:24px; padding-right:24px; }
   nav{ display:none; }
