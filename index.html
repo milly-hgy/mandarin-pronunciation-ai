@@ -131,8 +131,7 @@
         <div class="ring-caption">Overall Score</div>
       </div>
       <div class="breakdown-header-left">
-        <div class="bd-kicker">AI Pronunciation Report</div>
-        <div class="bd-title">Your Pronunciation<br>Score Breakdown</div>
+        <div class="bd-title">Your AI<br>Pronunciation Report</div>
         <div class="bd-sub">Detailed mastery across all phonological categories</div>
         <div class="cefr-badge" id="cefrBadge" style="background:rgba(42,95,163,0.12);color:var(--blue);border-color:rgba(42,95,163,0.30);">
           B2 | Upper-Intermediate
@@ -151,8 +150,8 @@
       <div class="bd-cat">
         <div class="bd-cat-label"><strong>Simple Finals</strong>單韻母</div>
         <div class="bd-bar-track"><div class="bd-bar-fill col-a" data-w="88%" id="bar-sf"></div></div>
-        <div class="bd-pct high">88%</div>
-        <div class="bd-badge mastered">Mastered</div>
+        <div class="bd-pct high" id="pct-sf">88%</div>
+        <div class="bd-badge mastered" id="badge-sf">Mastered</div>
       </div>
       <div class="bd-cat" style="margin-top:-8px">
         <div></div>
@@ -168,8 +167,8 @@
       <div class="bd-cat">
         <div class="bd-cat-label"><strong>Initials</strong>聲母</div>
         <div class="bd-bar-track"><div class="bd-bar-fill col-b" data-w="71%" id="bar-ini"></div></div>
-        <div class="bd-pct mid">71%</div>
-        <div class="bd-badge improving">Improving</div>
+        <div class="bd-pct mid" id="pct-ini">71%</div>
+        <div class="bd-badge improving" id="badge-ini">Improving</div>
       </div>
       <div class="bd-cat" style="margin-top:-8px">
         <div></div>
@@ -188,8 +187,8 @@
       <div class="bd-cat">
         <div class="bd-cat-label"><strong>Compound Finals</strong>複韻母</div>
         <div class="bd-bar-track"><div class="bd-bar-fill col-c" data-w="74%" id="bar-cf"></div></div>
-        <div class="bd-pct mid">74%</div>
-        <div class="bd-badge improving">Improving</div>
+        <div class="bd-pct mid" id="pct-cf">74%</div>
+        <div class="bd-badge improving" id="badge-cf">Improving</div>
       </div>
       <div class="bd-cat" style="margin-top:-8px">
         <div></div>
@@ -208,8 +207,8 @@
       <div class="bd-cat">
         <div class="bd-cat-label"><strong>Tones</strong>聲調</div>
         <div class="bd-bar-track"><div class="bd-bar-fill col-d" data-w="63%" id="bar-t"></div></div>
-        <div class="bd-pct low">63%</div>
-        <div class="bd-badge focus">Needs Focus</div>
+        <div class="bd-pct low" id="pct-t">63%</div>
+        <div class="bd-badge focus" id="badge-t">Needs Focus</div>
       </div>
       <div class="bd-cat" style="margin-top:-8px">
         <div></div>
@@ -550,17 +549,87 @@ let currentSyllables = SYLLABLES;
    SCORE → CEFR LEVEL
 ═══════════════════════════════════════════ */
 function scoreToLevel(score) {
-  if (score >= 96) return { level:'C2', label:'Mastery',            color:'#38d8d8' };
-  if (score >= 86) return { level:'C1', label:'Proficient',         color:'#34d8a0' };
-  if (score >= 71) return { level:'B2', label:'Upper-Intermediate', color:'#4f8ef7' };
-  if (score >= 56) return { level:'B1', label:'Intermediate',       color:'#f0b429' };
-  if (score >= 41) return { level:'A2', label:'Elementary',         color:'#f07848' };
+  if (score >= 95) return { level:'C2', label:'Mastery',            color:'#38d8d8' };
+  if (score >= 85) return { level:'C1', label:'Advanced',           color:'#34d8a0' };
+  if (score >= 75) return { level:'B2', label:'Upper-Intermediate', color:'#4f8ef7' };
+  if (score >= 60) return { level:'B1', label:'Intermediate',       color:'#f0b429' };
+  if (score >= 40) return { level:'A2', label:'Elementary',         color:'#f07848' };
   return              { level:'A1', label:'Beginner',           color:'#e8503a' };
+}
+
+function scoreToBadge(pct) {
+  if (pct >= 90) return { label:'Mastered',    cls:'mastered'  };
+  if (pct >= 75) return { label:'Improving',   cls:'improving' };
+  if (pct >= 50) return { label:'Developing',  cls:'improving' };
+  return              { label:'Needs Focus', cls:'focus'     };
+}
+
+/* ═══════════════════════════════════════════
+   REPORT UPDATER — reads syllable data only,
+   never touches utteranceDisplay or click handlers
+═══════════════════════════════════════════ */
+function updateReportFromUI(syllables) {
+  const N = syllables.length;
+  if (!N) return;
+
+  // Count errors by type from the JS data (safe — no DOM reads on syllable cards)
+  const toneErrs     = syllables.filter(s => s.type === 'tone-error').length;
+  const initialErrs  = syllables.filter(s => s.type === 'initial-error').length;
+  const vowelErrs    = syllables.filter(s => s.type === 'vowel-error').length;
+  const compoundErrs = syllables.filter(s => s.type === 'compound-error').length;
+
+  const sf  = Math.round(((N - vowelErrs)    / N) * 100);
+  const ini = Math.round(((N - initialErrs)  / N) * 100);
+  const cf  = Math.round(((N - compoundErrs) / N) * 100);
+  const t   = Math.round(((N - toneErrs)     / N) * 100);
+  const overall = Math.round((sf + ini + cf + t) / 4);
+  const cefr    = scoreToLevel(overall);
+
+  // Ring
+  const ringText = document.getElementById('ringScoreText');
+  if (ringText) ringText.textContent = overall;
+  animateScoreRing(overall);
+
+  // CEFR badge
+  const cefrEl = document.getElementById('cefrBadge');
+  if (cefrEl) {
+    cefrEl.textContent        = cefr.level + ' — ' + cefr.label;
+    cefrEl.style.background   = cefr.color + '22';
+    cefrEl.style.color        = cefr.color;
+    cefrEl.style.borderColor  = cefr.color + '55';
+  }
+
+  // Category bars, percentage text, and status badges
+  [
+    { bar:'bar-sf',  pct:'pct-sf',  badge:'badge-sf',  score: sf  },
+    { bar:'bar-ini', pct:'pct-ini', badge:'badge-ini', score: ini },
+    { bar:'bar-cf',  pct:'pct-cf',  badge:'badge-cf',  score: cf  },
+    { bar:'bar-t',   pct:'pct-t',   badge:'badge-t',   score: t   },
+  ].forEach(({ bar, pct, badge, score }) => {
+    const barEl   = document.getElementById(bar);
+    const pctEl   = document.getElementById(pct);
+    const badgeEl = document.getElementById(badge);
+    const b       = scoreToBadge(score);
+    const lvl     = score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low';
+    if (pctEl)   { pctEl.textContent = score + '%'; pctEl.className = 'bd-pct ' + lvl; }
+    if (badgeEl) { badgeEl.textContent = b.label; badgeEl.className = 'bd-badge ' + b.cls; }
+    if (barEl)   { barEl.style.width = '0'; setTimeout(() => { barEl.style.width = score + '%'; }, 100); }
+  });
 }
 
 /* ═══════════════════════════════════════════
    REAL-TIME STT (Web Speech API)
 ═══════════════════════════════════════════ */
+const STT_MIC_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+  <line x1="12" y1="19" x2="12" y2="23"/>
+  <line x1="8"  y1="23" x2="16" y2="23"/>
+</svg>`;
+const STT_STOP_ICON = `<svg viewBox="0 0 24 24" fill="white">
+  <rect x="5" y="5" width="14" height="14" rx="2"/>
+</svg>`;
+
 function startSTT() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
@@ -569,46 +638,61 @@ function startSTT() {
     return;
   }
 
-  // Toggle off if already listening
-  if (isListening) {
-    if (activeRecognition) activeRecognition.stop();
-    return;
-  }
-
-  const recognition   = new SR();
-  activeRecognition   = recognition;
-  recognition.lang           = 'zh-CN';
-  recognition.continuous     = false;
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
-
-  isListening = true;
   const btn  = document.getElementById('recordMainBtn');
   const stat = document.getElementById('rpStatus');
   const res  = document.getElementById('rpResult');
 
-  btn.classList.add('listening');
-  stat.textContent = '● Listening… speak now';
-  res.textContent  = '';
-  sttRecognized    = '';
+  // Second click: manually stop and trigger analysis
+  if (isListening) {
+    isListening = false;                    // set before stop() so onend doesn't restart
+    if (activeRecognition) activeRecognition.stop();
+    return;
+  }
 
+  // First click: start recording
+  const recognition = new SR();
+  activeRecognition = recognition;
+  recognition.lang            = 'zh-CN';
+  recognition.continuous      = true;       // keep running through pauses
+  recognition.interimResults  = true;
+  recognition.maxAlternatives = 1;
+
+  isListening      = true;
+  sttRecognized    = '';
+  res.textContent  = '';
+
+  btn.classList.add('listening');
+  btn.innerHTML    = STT_STOP_ICON;
+  btn.setAttribute('aria-label', 'Stop recording');
+  stat.textContent = '● Recording… Tap to stop';
+
+  // Accumulate final results; show interim text live
   recognition.onresult = (e) => {
-    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-    res.textContent = transcript;
-    if (e.results[e.results.length - 1].isFinal) {
-      sttRecognized = transcript;
+    let finalText = '', interimText = '';
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText   += e.results[i][0].transcript;
+      else                      interimText += e.results[i][0].transcript;
     }
+    sttRecognized    = finalText;
+    res.textContent  = finalText + interimText;
   };
 
+  // onend fires on manual stop OR on browser timeout
   recognition.onend = () => {
-    isListening = false;
+    if (isListening) {
+      // Browser ended session early (e.g. Chrome ~60s limit) — restart automatically
+      try { recognition.start(); } catch(_) {}
+      return;
+    }
+    // User clicked stop — reset UI and run analysis
     btn.classList.remove('listening');
+    btn.innerHTML = STT_MIC_ICON;
+    btn.setAttribute('aria-label', 'Start recording');
+
     if (sttRecognized) {
       stat.textContent = '✓ Captured — running AI analysis…';
-      // Immediately update Target Sentence display
       const tse = document.getElementById('targetSentenceText');
       if (tse) tse.textContent = sttRecognized;
-      // Show captured text in upload zone
       const zone = document.getElementById('uploadZone');
       zone.innerHTML = `
         <div class="upload-icon" style="background:rgba(52,216,160,0.2)">
@@ -622,18 +706,21 @@ function startSTT() {
       setTimeout(runProcessing, 400);
     } else {
       stat.textContent = 'Tap to Record';
-      res.textContent  = 'No speech detected — try again.';
+      res.textContent  = '';
     }
   };
 
   recognition.onerror = (e) => {
+    if (e.error === 'no-speech') return;    // normal in continuous mode — keep listening
+    // Non-recoverable error: reset state
     isListening = false;
     btn.classList.remove('listening');
+    btn.innerHTML = STT_MIC_ICON;
+    btn.setAttribute('aria-label', 'Start recording');
     if (e.error === 'not-allowed') {
       alert('Microphone access was denied.\nPlease allow microphone access in your browser settings and try again.');
     } else {
-      const stat2 = document.getElementById('rpStatus');
-      if (stat2) stat2.textContent = 'Error: ' + e.error + ' — tap to retry';
+      stat.textContent = 'Error: ' + e.error + ' — tap to retry';
     }
   };
 
@@ -1004,28 +1091,11 @@ function runProcessing() {
 }
 
 function showResults() {
-  /* — Dynamic score (60-95) + CEFR — */
-  const dynamicScore = Math.floor(Math.random() * 36) + 60;
-  const cefr         = scoreToLevel(dynamicScore);
-
-  // Update ring score text
-  const ringText = document.getElementById('ringScoreText');
-  if (ringText) ringText.textContent = dynamicScore;
-
-  // Update CEFR badge
-  const cefrEl = document.getElementById('cefrBadge');
-  if (cefrEl) {
-    cefrEl.textContent   = cefr.level + ' — ' + cefr.label;
-    cefrEl.style.background   = cefr.color + '22';
-    cefrEl.style.color        = cefr.color;
-    cefrEl.style.borderColor  = cefr.color + '55';
-  }
-
   // Target sentence
   const tse = document.getElementById('targetSentenceText');
   if (tse && sttRecognized) tse.textContent = sttRecognized;
 
-  // Build syllables from STT or fallback
+  // Build syllables once — shared by scoring, contour, utterance, and error summary
   currentSyllables = sttRecognized ? buildSyllablesFromSTT(sttRecognized) : SYLLABLES;
 
   /* — Pitch contour section — */
@@ -1040,19 +1110,8 @@ function showResults() {
   setTimeout(() => {
     setFlowStep(4);
     document.getElementById('scoreBreakdownSection').classList.add('visible');
-    setTimeout(() => animateScoreRing(dynamicScore), 200);
-
-    // Randomised sub-scores (plausible range)
-    const sfPct  = Math.floor(Math.random() * 20) + 72;
-    const iniPct = Math.floor(Math.random() * 20) + 58;
-    const cfPct  = Math.floor(Math.random() * 22) + 60;
-    const tPct   = Math.floor(Math.random() * 24) + 48;
-    setTimeout(() => {
-      [['bar-sf', sfPct+'%'],['bar-ini', iniPct+'%'],['bar-cf', cfPct+'%'],['bar-t', tPct+'%']].forEach(([id,w]) => {
-        const el = document.getElementById(id);
-        if (el) { el.style.width = '0'; setTimeout(() => { el.style.width = w; }, 100); }
-      });
-    }, 300);
+    // Drive all score UI from the same currentSyllables — no random numbers
+    setTimeout(() => updateReportFromUI(currentSyllables), 200);
   }, 800);
 
   /* — Results / Breakdown section — */
@@ -1332,6 +1391,14 @@ function drawFullSentenceContour(pitchData) {
   });
 }
 
+/* ── Fallback video map for STT-generated syllables (no explicit videoSrc) ── */
+const ERROR_VIDEO_MAP = {
+  'tone-error':     { akey:'tone2', videoSrc:'https://www.youtube.com/embed/n_Cj3aOSI1w?start=433', label:'2nd Tone Rising Contour' },
+  'initial-error':  { akey:'xsh',   videoSrc:'https://www.youtube.com/embed/05BMKdxHjp8?start=33',  label:'x vs. sh: Tongue Position' },
+  'vowel-error':    { akey:'iao',   videoSrc:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260', label:'-iao Compound Final' },
+  'compound-error': { akey:'iao',   videoSrc:'https://www.youtube.com/embed/IwXyiWNv1Ts?start=260', label:'-iao Compound Final' },
+};
+
 /* ═══════════════════════════════════════════
    UTTERANCE DISPLAY (with coloured Pinyin)
 ═══════════════════════════════════════════ */
@@ -1352,26 +1419,24 @@ function buildUtterance(syllables) {
       <div class="syl-pinyin">${coloredPinyin}</div>
       <div class="syl-tooltip">${s.tooltip}</div>`;
 
-    // Click: open anatomy guide + load targeted video (NO autoplay)
-    if (s.videoSrc) {
-      el.style.cursor = 'pointer';
-      el.onclick = () => {
-        // Load video without autoplay
-        const iframe  = document.getElementById('ytPlayer');
-        const caption = document.getElementById('videoCaption');
-        const ph      = document.getElementById('ytPlaceholder');
-        if (iframe)  { iframe.src = s.videoSrc; iframe.style.opacity = '1'; }
-        if (ph)      ph.style.display = 'none';
-        if (caption) caption.textContent = s.videoLabel || 'Targeted tutorial loaded.';
-        // Open anatomy guide + update inline card
-        if (s.anatomyKey && ANATOMY[s.anatomyKey]) { openAnatomy(s.anatomyKey); updateAicCard(s.anatomyKey); }
-        // Show video section and scroll
-        const vs = document.getElementById('videoSection');
-        if (vs) { vs.classList.add('visible'); setTimeout(()=>vs.scrollIntoView({behavior:'smooth'}), 50); }
-      };
+    // Resolve video info: use explicit syllable data first, fall back to error-type map
+    const videoInfo = (s.videoSrc && s.anatomyKey)
+      ? { akey: s.anatomyKey, videoSrc: s.videoSrc, label: s.videoLabel || '' }
+      : (ERROR_VIDEO_MAP[s.type] || null);
+
+    if (videoInfo) {
+      // Store on element so the delegated listener can read them
+      el.dataset.videoSrc = videoInfo.videoSrc;
+      el.dataset.akey     = videoInfo.akey;
+      el.dataset.label    = videoInfo.label;
     }
 
-    el.style.cssText = 'opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease;';
+    // NOTE: set animation styles as separate properties — do NOT use cssText here
+    // because cssText overwrites any inline cursor:pointer set above.
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateY(10px)';
+    el.style.transition = 'opacity .35s ease, transform .35s ease';
+
     container.appendChild(el);
     setTimeout(() => { el.style.opacity='1'; el.style.transform='translateY(0)'; }, idx * 70);
   });
@@ -1486,6 +1551,22 @@ function updateAicCard(key) {
 }
 document.getElementById('anatomyModal').addEventListener('click',e=>{if(e.target===document.getElementById('anatomyModal')) closeAnatomy();});
 initIvpCards();
+
+/* ── Single delegated listener for all syllable cards (works even after innerHTML rebuild) ── */
+document.getElementById('utteranceDisplay').addEventListener('click', (e) => {
+  const card = e.target.closest('.syllable-unit[data-video-src]');
+  if (!card) return;
+  const { videoSrc, akey, label } = card.dataset;
+  const iframe  = document.getElementById('ytPlayer');
+  const caption = document.getElementById('videoCaption');
+  const ph      = document.getElementById('ytPlaceholder');
+  if (iframe)  { iframe.src = videoSrc; iframe.style.opacity = '1'; }
+  if (ph)      ph.style.display = 'none';
+  if (caption) caption.textContent = label || 'Targeted tutorial loaded.';
+  if (akey && ANATOMY[akey]) { openAnatomy(akey); updateAicCard(akey); }
+  const vs = document.getElementById('videoSection');
+  if (vs) { vs.classList.add('visible'); setTimeout(() => vs.scrollIntoView({behavior:'smooth'}), 50); }
+});
 
 /* ═══════════════════════════════════════════
    DRAG & DROP on upload zone
